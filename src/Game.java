@@ -1,15 +1,14 @@
 import processing.core.PApplet;
 
-import java.util.ArrayList;
-
 public class Game extends PApplet {
     public static Game gui = new Game();
     private Board b = new Board();
     private int lastTriggered = 0;
 
     @Override public void settings() {
-        size(400, 800);
+        size(400, 780);
     }
+
     @Override public void draw() {
         background(0);
         b.draw();
@@ -54,18 +53,32 @@ public class Game extends PApplet {
         int ci;
         switch(keyCode) {
             case 90:
-                ci = (Piece.getSelected() == null) ? (1) : b.getPieces().indexOf(Piece.getSelected());
-                Piece.setSelected(b.getPieces().get((ci == 0) ? (b.getPieces().size() - 1) : (ci - 1)));
+                if(!b.getMoveLog().empty()) {
+                    MoveLog toTake = b.getMoveLog().pop();
+                    b.setMovesMade(b.getMovesMade() - 1);
+                    toTake.getReference().move(Piece.MoveDirection.invert(toTake.getMove()));
+                }
                 break;
-            case 88:
-            case 9:
+
+            case 82:
+                Piece.setHovered(null);
+                Piece.setSelected(null);
+                Board.setWon(false);
+                b = new Board();
+                break;
+            case 44:
                 ci = (Piece.getSelected() == null) ? (-1) : b.getPieces().indexOf(Piece.getSelected());
                 Piece.setSelected(b.getPieces().get((ci == b.getPieces().size() - 1) ? (0) : (ci + 1)));
+                break;
+            case 46:
+                ci = (Piece.getSelected() == null) ? (1) : b.getPieces().indexOf(Piece.getSelected());
+                Piece.setSelected(b.getPieces().get((ci == 0) ? (b.getPieces().size() - 1) : (ci - 1)));
                 break;
         }
     }
 
     public static void main(String[] args) {
         PApplet.runSketch(new String[]{"Huarong Dao"}, gui);
+
     }
 }

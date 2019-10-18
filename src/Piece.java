@@ -1,3 +1,4 @@
+import com.sun.istack.internal.NotNull;
 import processing.core.PApplet;
 
 public class Piece {
@@ -27,12 +28,22 @@ public class Piece {
         LEFT,
         RIGHT,
         UP,
-        DOWN
+        DOWN;
+
+        public static MoveDirection invert(MoveDirection dir) {
+            switch(dir) {
+                case UP: return DOWN;
+                case DOWN: return UP;
+                case LEFT: return RIGHT;
+                case RIGHT: return LEFT;
+            }
+            return null;
+        }
     }
 
     private Type type;
-//    private float x;
-//    private float y;
+    private String name;
+
     private float width;
     private float height;
 
@@ -40,15 +51,15 @@ public class Piece {
     private int extendX;
     private int extendY;
 
-    public Piece(Type _type, int _position) {
+    public Piece(Type _type, int _position, String _name) {
         type = _type;
         position = _position;
+        name = _name;
 
         extendX = type.width;
         extendY = type.height;
         width = type.width * PIECE_WIDTH;
         height = type.height * PIECE_HEIGHT;
-
     }
 
     public void draw() {
@@ -64,21 +75,32 @@ public class Piece {
         Game.gui.rect(getX(), getY(), width, height);
     }
 
-    public void move(MoveDirection direction) {
+    public boolean move(MoveDirection direction) {
+        boolean moveMade = true;
         switch(direction) {
             case UP:
                 if(position / 4 > 0) position -= 4;
+                else moveMade = false;
                 break;
             case DOWN:
-                if((position + (type.height-1)*4) / 4 < 4) position += 4;
+                if((type == Type.KING && position == 13 || position == 17) || (position + (type.height-1)*4) / 4 < 4) {
+                    position += 4;
+                    if(position == 21 && type == Type.KING) {
+                        Board.setWon(true);
+                    }
+                }
+                else moveMade = false;
                 break;
             case LEFT:
                 if((position) % 4 > 0) position -= 1;
+                else moveMade = false;
                 break;
             case RIGHT:
                 if((position + type.width - 1) % 4 < 3) position += 1;
+                else moveMade = false;
                 break;
         }
+        return moveMade;
     }
 
     public boolean isMoused() {
@@ -94,6 +116,14 @@ public class Piece {
     }
     public void setType(Type _type) {
         type = _type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String _name) {
+        name = _name;
     }
 
     public float getX() {
