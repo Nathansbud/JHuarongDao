@@ -1,3 +1,5 @@
+import processing.core.PApplet;
+
 public class Piece {
     private static Piece selected = null;
     private static Piece hovered = null;
@@ -6,16 +8,18 @@ public class Piece {
     private static float PIECE_HEIGHT = 100;
 
     enum Type {
-        LONG(2, 1),
-        SQUARE(1,1),
-        TALL(1, 2),
-        KING(2, 2);
+        LONG(2, 1, "ffffff33"),
+        SQUARE(1,1, "ffffb6c1"),
+        TALL(1, 2, "ff89cff0"),
+        KING(2, 2, "ff98fb98");
 
         public int width;
         public int height;
-        Type(int _width, int _height) {
+        public String color;
+        Type(int _width, int _height, String _color) {
             width = _width;
             height = _height;
+            color = _color;
         }
     }
 
@@ -33,21 +37,27 @@ public class Piece {
     private float height;
 
     private int position;
+    private int extendX;
+    private int extendY;
 
     public Piece(Type _type, int _position) {
         type = _type;
         position = _position;
 
+        extendX = type.width;
+        extendY = type.height;
         width = type.width * PIECE_WIDTH;
         height = type.height * PIECE_HEIGHT;
+
     }
 
     public void draw() {
-        Game.gui.fill(152, 118, 84);
+        Game.gui.fill(PApplet.unhex(type.color));
+        Game.gui.strokeWeight(2);
         if(isSelected()) {
-            Game.gui.stroke(255, 255, 0);
-        } else if(isMoused()) {
             Game.gui.stroke(255, 0, 0);
+        } else if(isMoused()) {
+            Game.gui.stroke(0, 0, 255);
         } else {
             Game.gui.stroke(0);
         }
@@ -116,6 +126,32 @@ public class Piece {
     public void setPosition(int _position) {
         position = _position;
     }
+
+    public int getExtendX() {
+        return extendX;
+    }
+
+    public void setExtendX(int _extendX) {
+        extendX = _extendX;
+    }
+
+    public int getExtendY() {
+        return extendY;
+    }
+
+    public void setExtendY(int _extendY) {
+        extendY = _extendY;
+    }
+
+    public int getColumn() {
+        return position % 4;
+    }
+
+    public int getRow() {
+        return position / 4;
+    }
+
+
 
     public static float getPieceWidth() {
         return PIECE_WIDTH;
