@@ -5,15 +5,11 @@ import java.util.ArrayList;
 public class Game extends PApplet {
     public static Game gui = new Game();
     private Board b = new Board();
+    private int lastTriggered = 0;
 
     @Override public void settings() {
         size(400, 800);
     }
-
-    @Override public void setup() {
-
-    }
-
     @Override public void draw() {
         background(0);
         b.draw();
@@ -23,54 +19,36 @@ public class Game extends PApplet {
         if(Piece.getHovered() != null && Piece.getHovered().isMoused()) Piece.setSelected(Piece.getHovered());
     }
 
+    @Override public void mouseDragged() {
+        if(millis() - lastTriggered > 200) {
+            if (Piece.getSelected() != null && mouseX > pmouseX && Piece.getSelected().isMoused()) {
+                if(b.move(Piece.getSelected(), Piece.MoveDirection.RIGHT)) {
+                    lastTriggered = millis();
+                    return;
+                }
+            } else if (mouseX < pmouseX) {
+                if(b.move(Piece.getSelected(), Piece.MoveDirection.LEFT)) {
+                    lastTriggered = millis();
+                    return;
+                }
+            }
+
+            if (Piece.getSelected() != null && mouseY > pmouseY && Piece.getSelected().isMoused()) {
+                if(b.move(Piece.getSelected(), Piece.MoveDirection.DOWN)) lastTriggered = millis();
+            }
+            else if (mouseY < pmouseY) {
+                if(b.move(Piece.getSelected(), Piece.MoveDirection.UP)) lastTriggered = millis();
+            }
+        }
+    }
+
     @Override public void keyPressed() {
         if(Piece.getSelected() != null) {
-            Piece p = Piece.getSelected();
             switch (keyCode) {
-                case 37:
-                    //noinspection DuplicatedCode
-                    for(Piece cp : b.getPieces()) {
-                        if(cp != p) {
-                            if (cp.getColumn() + cp.getExtendX() == p.getColumn() && cp.getRow() + cp.getExtendY() - 1 >= p.getRow() && cp.getRow() <= p.getRow() + p.getExtendY() - 1){
-                                return;
-                            }
-                        }
-                    }
-                    Piece.getSelected().move(Piece.MoveDirection.LEFT);
-                    break;
-                case 39:
-                    //noinspection DuplicatedCode
-                    for(Piece cp : b.getPieces()) {
-                        if(cp != p) {
-                            if (cp.getColumn() == p.getColumn()+ p.getExtendX() && cp.getRow() + cp.getExtendY() - 1 >= p.getRow() && cp.getRow() <= p.getRow() + p.getExtendY() - 1){
-                                return;
-                            }
-                        }
-                    }
-                    Piece.getSelected().move(Piece.MoveDirection.RIGHT);
-                    break;
-                case 38:
-                    //noinspection DuplicatedCode
-                    for(Piece cp : b.getPieces()) {
-                        if(cp != p) {
-                            if (cp.getRow() + cp.getExtendY() == p.getRow() && cp.getColumn() + cp.getExtendX() - 1 >= p.getColumn() && cp.getColumn() <= p.getColumn() + p.getExtendX() - 1){
-                                return;
-                            }
-                        }
-                    }
-                    Piece.getSelected().move(Piece.MoveDirection.UP);
-                    break;
-                case 40:
-                    //noinspection DuplicatedCode
-                    for(Piece cp : b.getPieces()) {
-                        if(cp != p) {
-                            if (cp.getRow() == p.getRow()+ p.getExtendY() && cp.getColumn() + cp.getExtendX() - 1 >= p.getColumn() && cp.getColumn() <= p.getColumn() + p.getExtendX() - 1){
-                                return;
-                            }
-                        }
-                    }
-                    Piece.getSelected().move(Piece.MoveDirection.DOWN);
-                    break;
+                case 37: b.move(Piece.getSelected(), Piece.MoveDirection.LEFT); break;
+                case 39: b.move(Piece.getSelected(), Piece.MoveDirection.RIGHT); break;
+                case 38: b.move(Piece.getSelected(), Piece.MoveDirection.UP); break;
+                case 40: b.move(Piece.getSelected(), Piece.MoveDirection.DOWN); break;
             }
         }
         int ci;
