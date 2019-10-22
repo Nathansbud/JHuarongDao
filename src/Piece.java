@@ -83,7 +83,7 @@ public class Piece {
                 else moveMade = false;
                 break;
             case DOWN:
-                if((type == Type.KING && position == 13 || position == 17) || (position + (type.height-1)*4) / 4 < 4) {
+                if((type == Type.KING && (position == 13 || position == 17)) || (position + (type.height-1)*4) / 4 < 4) {
                     position += 4;
                     if(position == 21 && type == Type.KING) {
                         Board.setWon(true);
